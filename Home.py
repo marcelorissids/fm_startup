@@ -93,7 +93,7 @@ def main():
                          x='day_of_week', 
                          y='unique_invoice_count', 
                          labels={'unique_invoice_count': 'Número de Vendas'}, 
-                         )
+                         title='Número de Vendas x Ticket Médio')
             fig.add_trace(px.line(data_sell, 
                                   x='day_of_week', 
                                   y='average_ticket', 
