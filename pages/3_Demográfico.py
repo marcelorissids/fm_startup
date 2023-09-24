@@ -8,7 +8,7 @@ from PIL import Image
 #from streamlit_folium import folium_static
 from folium.plugins import MarkerCluster
 
-dados_demograficos = pd.read_csv('/data/estados.csv')
+dados_demograficos = pd.read_csv('./data/estados.csv')
 
 
 def make_sidebar(df):
