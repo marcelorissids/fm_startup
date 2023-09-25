@@ -93,11 +93,12 @@ def main():
                          x='day_of_week', 
                          y='unique_invoice_count', 
                          labels={'unique_invoice_count': 'Número de Vendas'}, 
-                         title='Número de Vendas x Ticket Médio')
+                         )
             fig.add_trace(px.line(data_sell, 
                                   x='day_of_week', 
                                   y='average_ticket', 
-                                  labels={'average_ticket': 'Ticket Médio'}).data[0])
+                                  labels={'average_ticket': 'Ticket Médio'},
+                                  line_shape='linear').data[0])
             st.plotly_chart(fig) 
         
     select_classes = create_sidebar(df)
