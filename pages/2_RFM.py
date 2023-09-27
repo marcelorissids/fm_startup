@@ -17,9 +17,23 @@ def make_sidebar(df):
     st.write("---")
     st.sidebar.markdown("## Filtro")
 
+    ordem_classes = [
+    'Campeão',
+    'Cliente leal',
+    'Lealdade potencial',
+    'Clientes Recentes',
+    'Promissores',
+    'Precisam de atenção',
+    'Prestes a hibernar',
+    'Clientes em risco',
+    'Não posso perdê-lo',
+    'Hibernando',
+    'Clientes Perdidos'
+    ]
+
     classes = st.sidebar.selectbox(
         'Escolha o Cluster',
-        options=df['Classe'].unique().tolist(),
+        options=ordem_classes,
         index=0,
         placeholder='Selecione'
     )
@@ -75,22 +89,57 @@ def main():
     with st.container():
         st.write("---")
         st.subheader('Quantidade de Clientes por Classe')
+
+        ordem_classes = [
+            'Campeão',
+            'Cliente leal',
+            'Lealdade potencial',
+            'Clientes Recentes',
+            'Promissores',
+            'Precisam de atenção',
+            'Prestes a hibernar',
+            'Clientes em risco',
+            'Não posso perdê-lo',
+            'Hibernando',
+            'Clientes Perdidos'
+            ]
+        
         counts = df['Classe'].value_counts()
         percentages = (counts / counts.sum()) * 100
-        colors = ['red' if classe in ['Campeão', 'Cliente Leal'] else 'gray' for classe in counts.index]
-
+        colors = ['blue' if classe in ['Campeão', 'Cliente leal', 'Lealdade potencial'] else 'red' for classe in counts.index]
         
         data = pd.DataFrame({'Classe': counts.index, 'Quantidade de Clientes': counts.values, 'Porcentagem': percentages.values, 'Color': colors})
-
+        ordem_df = pd.DataFrame({'Classe': ordem_classes})
+        data = pd.merge(ordem_df, data, on='Classe', how='left')
+        data = data.append({'Classe': 'Não posso perdê-lo', 'Quantidade de Clientes': 0, 'Porcentagem': 0, 'Color': 'gray'}, ignore_index=True)
+#        st.write(data)
         
-        fig = px.bar(data, x='Quantidade de Clientes', y='Classe', color='Color', text='Porcentagem')
-        fig.update_traces(texttemplate='%{text:.2f}%', textposition='inside', marker=dict(line=dict(width=1, color='black')))
-
+        fig = px.bar(data, 
+                     x='Quantidade de Clientes', 
+                     y='Classe', 
+                     color='Classe', 
+                     text='Porcentagem',
+                     color_discrete_sequence=[
+                          '#A6290d',
+                          '#A6290d',
+                          '#A6290d',
+                          '#B7b5b4',
+                          '#B7b5b4',
+                          '#B7b5b4',
+                          '#B7b5b4',
+                          '#B7b5b4',
+                          '#B7b5b4',
+                          '#B7b5b4',
+                          '#B7b5b4'],
+                     )
         
+        fig.update_traces(texttemplate='%{text:.2f}%', textposition='inside', marker=dict(line=dict(width=1, color='black')))        
         fig.update_layout(xaxis_title='Quantidade de Clientes', yaxis_title='Classe')
         fig.update_xaxes(showgrid=True, zeroline=False)
         fig.update_yaxes(showgrid=False)
         st.plotly_chart(fig)
+
+
 
 
 #        valor_medio_por_classe = df.groupby('Classe')['ValorMonetário'].mean()

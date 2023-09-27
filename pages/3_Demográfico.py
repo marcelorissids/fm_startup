@@ -19,10 +19,25 @@ def make_sidebar(dados_regiao):
     image = Image.open(image_path + 'logo_target.png')
 
     st.sidebar.image(image, width=240)
+
+    ordem_classes = [
+    'Campeão',
+    'Cliente leais',
+    'Lealdade potencial',
+    'Clientes Recentes',
+    'Promissores',
+    'Precisam de atenção',
+    'Prestes a hibernar',
+    'Clientes em risco',
+    'Não posso perdê-lo',
+    'Hibernando',
+    'Clientes Perdidos'
+    ]
+
     
     clusters = st.sidebar.selectbox(
         'Escolha o Cluster',
-        options=df['Classe'].unique().tolist(),
+        options=ordem_classes,
         index=0,
         placeholder='Selecione'
     )

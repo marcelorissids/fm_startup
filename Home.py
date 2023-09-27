@@ -53,8 +53,8 @@ def create_sidebar(df):
 def main():
 
     st.set_page_config(
-    page_title='Kawá Dashboard',
-    page_icon=':hot_beverage:',
+    page_title='Dashboard',
+    page_icon=':bar-chart:',
     layout='wide'
     )
 
@@ -99,9 +99,10 @@ def main():
             text_label = f'R${fatum:.2f}'
             fig.add_annotation(
                 x=row['mês'],
-                y=row['faturamento']+9,
+                y=row['faturamento']+10000,
                 text=text_label,
-                showarrow=False,           
+                showarrow=False,
+                font=dict(size=12, color='black')           
             )
 
         st.plotly_chart(fig)
@@ -120,9 +121,10 @@ def main():
                 text_label = f'RS{ticket_medio:.2f}'
                 fig.add_annotation(
                     x=row['day_of_week'],
-                    y=row['unique_invoice_count']+5,
+                    y=row['unique_invoice_count']+50,
                     text= text_label,
                     showarrow=False,
+                    font=dict(size=12, color='black')
                 )
 #            fig.update_traces(text=data_sell['day_of_week'], textposition='outside')
 #            fig.update_traces(text=data_sell['Dias da Semana'], textposition='outside')
