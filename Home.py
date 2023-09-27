@@ -27,14 +27,14 @@ def create_sidebar(df):
     image_path = './images/'
     image = Image.open(image_path + 'logo_target.png')
 
-    st.sidebar.image(image, width=120)
+    st.sidebar.image(image, width=240)
 
-    classes = st.sidebar.selectbox(
-        'Escolha as Tags',
-        options=df['Classe'].unique().tolist(),
-        index=None,
-        placeholder='Selecione'
-    )
+#    classes = st.sidebar.selectbox(
+#        'Escolha as Tags',
+#        options=df['Classe'].unique().tolist(),
+#        index=None,
+#        placeholder='Selecione'
+#    )
 
     st.sidebar.markdown("""---""")
     st.sidebar.markdown('### Planilha Completa')
@@ -61,11 +61,13 @@ def main():
     with st.container():
         st.header('Resumo das Métricas')
 
+        customers = df['customer_id'].nunique()
         receita = df['ValorMonetário'].sum()
         pedidos = df['Frequência'].sum()
-        ticket_medio = df['ValorMonetário'].mean()
+        ticket_medio = receita/pedidos
 
-        col1, col2, col3 = st.columns(3)
+
+        col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             st.metric('Receita Total', f'R${receita:,.2f}')
@@ -74,31 +76,67 @@ def main():
             st.metric('Total de Pedidos', f'{pedidos}')
         
         with col3:
+            st.metric('Clientes únicos', f'{customers}')
+
+        with col4:
             st.metric('Ticket Médio', f'R${ticket_medio:,.2f}')
 
     with st.container():
         st.write("---")
         st.subheader('Faturamento por Mês')
+        meses = {1: 'Jan', 2: 'Fev', 3: 'Mar', 4: 'Abr', 5: 'Mai', 6: 'Jun',
+                 7: 'Jul', 8: 'Ago', 9: 'Set', 10: 'Out', 11: 'Nov', 12: 'Dez'}
+        
+        data_fatu['mês'] = data_fatu['month'].map(meses)
+
         fig = px.bar(data_fatu, 
-                         x='month', 
+                         x='mês', 
                          y='faturamento', 
-                         labels={'faturamento': 'Faturamento Mensal'},
+                         labels={'faturamento': 'Faturamento'},
                          )
+        for i, row in data_fatu.iterrows():
+            fatum = row['faturamento']
+            text_label = f'R${fatum:.2f}'
+            fig.add_annotation(
+                x=row['mês'],
+                y=row['faturamento']+9,
+                text=text_label,
+                showarrow=False,           
+            )
+
         st.plotly_chart(fig)
 
     with st.container():
             st.write("---")
-            st.subheader('Número de Vendas x Ticket Médio')     
+            st.subheader('Número de Vendas x Ticket Médio')
             fig = px.bar(data_sell, 
                          x='day_of_week', 
                          y='unique_invoice_count', 
                          labels={'unique_invoice_count': 'Número de Vendas'}, 
                          )
-            fig.add_trace(px.line(data_sell, 
-                                  x='day_of_week', 
-                                  y='average_ticket', 
-                                  labels={'average_ticket': 'Ticket Médio'},
-                                  line_shape='linear').data[0])
+            
+            for i, row in data_sell.iterrows():
+                ticket_medio = row['average_ticket']
+                text_label = f'RS{ticket_medio:.2f}'
+                fig.add_annotation(
+                    x=row['day_of_week'],
+                    y=row['unique_invoice_count']+5,
+                    text= text_label,
+                    showarrow=False,
+                )
+#            fig.update_traces(text=data_sell['day_of_week'], textposition='outside')
+#            fig.update_traces(text=data_sell['Dias da Semana'], textposition='outside')
+#            linha = px.line(data_sell,
+#                            x='Dias da Semana', 
+#                            y='average_ticket', 
+#                            labels={'average_ticket': 'Ticket Médio'},
+#                            line_shape='linear',
+#                            )
+#            linha.update_traces(mode='markers+lines', marker=dict(size=10, symbol='circle-open', color='red'))
+#
+#            for trace in linha.data:
+#                fig.add_trace(trace)
+#                
             st.plotly_chart(fig) 
         
     select_classes = create_sidebar(df)

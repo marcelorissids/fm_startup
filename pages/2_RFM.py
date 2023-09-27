@@ -10,10 +10,15 @@ data_fatu = pd.read_csv('./data/faturamento_mes.csv')
 data_sell = pd.read_csv('./data/semana_ticket.csv')
 
 def make_sidebar(df):
-    st.sidebar.markdown("## Filters")
+    image_path = './images/'
+    image = Image.open(image_path + 'logo_target.png')
+
+    st.sidebar.image(image, width=240)
+    st.write("---")
+    st.sidebar.markdown("## Filtro")
 
     classes = st.sidebar.selectbox(
-        'Escolha as Tags',
+        'Escolha o Cluster',
         options=df['Classe'].unique().tolist(),
         index=0,
         placeholder='Selecione'
@@ -29,10 +34,10 @@ def main():
 
     st.markdown("# Análise RFM")
 
-    image_path = './images/'
-    image = Image.open(image_path + 'matriz_rfm.png')
+#    image_path = './images/'
+#    image = Image.open(image_path + 'matriz_rfm.png')
 
-    st.image(image)
+#    st.image(image)
 
     if selected_class != 'Selecione':
         filtered_df = df[df['Classe'] == selected_class]
@@ -47,6 +52,25 @@ def main():
                       file_name='classe_.csv',
                       mime='text/csv',
             )
+    with st.container():
+        st.write("---")
+        st.subheader('Cluster Selecionado')
+        clientes = filtered_df.groupby('Classe')['customer_id'].count()
+        fatu_tags = filtered_df.groupby('Classe')['ValorMonetário'].sum()
+        pedidos_tags = filtered_df.groupby('Classe')['Frequência'].sum()
+        ticket_medio = (fatu_tags / pedidos_tags).round(2)
+        recencia_media = filtered_df.groupby('Classe')['Recência'].mean().round().astype(int)
+
+        resumo_df = pd.DataFrame({
+             'Quantidade de Clientes': clientes,
+            'Média de Recência':recencia_media,
+            'Total de Pedidos': pedidos_tags,
+            'Faturamento Total': fatu_tags,
+            'Ticket Médio': ticket_medio
+        })
+
+        st.write(resumo_df)
+
 
     with st.container():
         st.write("---")
@@ -55,52 +79,50 @@ def main():
         percentages = (counts / counts.sum()) * 100
         colors = ['red' if classe in ['Campeão', 'Cliente Leal'] else 'gray' for classe in counts.index]
 
-        # Create a DataFrame for the chart
+        
         data = pd.DataFrame({'Classe': counts.index, 'Quantidade de Clientes': counts.values, 'Porcentagem': percentages.values, 'Color': colors})
 
-        # Create the horizontal bar chart using Plotly Express
+        
         fig = px.bar(data, x='Quantidade de Clientes', y='Classe', color='Color', text='Porcentagem')
         fig.update_traces(texttemplate='%{text:.2f}%', textposition='inside', marker=dict(line=dict(width=1, color='black')))
 
-        # Customize the layout
+        
         fig.update_layout(xaxis_title='Quantidade de Clientes', yaxis_title='Classe')
         fig.update_xaxes(showgrid=True, zeroline=False)
         fig.update_yaxes(showgrid=False)
         st.plotly_chart(fig)
 
-    with st.container():
-        st.write("---")
-        st.subheader('Valor Médio de Ticket por Classe')
-        valor_medio_por_classe = df.groupby('Classe')['ValorMonetário'].mean()
-        valor_medio_por_classe = valor_medio_por_classe.loc[counts.index]  # Reordena de acordo com a contagem
-        # Create a DataFrame for the chart
-        data = pd.DataFrame({'Classe': valor_medio_por_classe.index, 'Valor Médio de Ticket': valor_medio_por_classe.values})
 
-        # Create the horizontal bar chart using Plotly Express
-        fig = px.bar(data, x='Valor Médio de Ticket', y='Classe', orientation='h', title='Valor Médio de Ticket por Classe', color='Classe')
+#        valor_medio_por_classe = df.groupby('Classe')['ValorMonetário'].mean()
+#        valor_medio_por_classe = valor_medio_por_classe.loc[counts.index]  # Reordena de acordo com a contagem
+#        # Create a DataFrame for the chart
+#        data = pd.DataFrame({'Classe': valor_medio_por_classe.index, 'Valor Médio de Ticket': valor_medio_por_classe.values})
+#
+#        # Create the horizontal bar chart using Plotly Express
+#        fig = px.bar(data, x='Valor Médio de Ticket', y='Classe', orientation='h', title='Valor Médio de Ticket por Classe', color='Classe')
+#
+#        # Customize the layout
+#        fig.update_xaxes(title='Valor Médio de Ticket')
+#        fig.update_yaxes(title='Classe')
+#        st.plotly_chart(fig)
 
-        # Customize the layout
-        fig.update_xaxes(title='Valor Médio de Ticket')
-        fig.update_yaxes(title='Classe')
-        st.plotly_chart(fig)
-
-    with st.container():
-        st.write("---")
-        st.subheader('Recência Média por Classe')
-        # Substitua 'classe' e 'Recência' pelos nomes reais das colunas
-        # nos dados de vendas
-        recencia_media_por_classe = df.groupby('Classe')['Recência'].mean()
-        recencia_media_por_classe = recencia_media_por_classe.loc[counts.index]  # Reordena de acordo com a contagem
-        # Create a DataFrame for the chart
-        data = pd.DataFrame({'Classe': recencia_media_por_classe.index, 'Recência Média': recencia_media_por_classe.values})
-
-        # Create the horizontal bar chart using Plotly Express
-        fig = px.bar(data, x='Recência Média', y='Classe', orientation='h', title='Recência Média por Classe', color='Classe')
-
-        # Customize the layout
-        fig.update_xaxes(title='Recência Média')
-        fig.update_yaxes(title='Classe')
-        st.plotly_chart(fig)
+#    with st.container():
+#        st.write("---")
+#        st.subheader('Recência Média por Classe')
+#        # Substitua 'classe' e 'Recência' pelos nomes reais das colunas
+#        # nos dados de vendas
+#        recencia_media_por_classe = df.groupby('Classe')['Recência'].mean()
+#        recencia_media_por_classe = recencia_media_por_classe.loc[counts.index]  # Reordena de acordo com a contagem
+#        # Create a DataFrame for the chart
+#        data = pd.DataFrame({'Classe': recencia_media_por_classe.index, 'Recência Média': recencia_media_por_classe.values})
+#
+#        # Create the horizontal bar chart using Plotly Express
+#        fig = px.bar(data, x='Recência Média', y='Classe', orientation='h', title='Recência Média por Classe', color='Classe')
+#
+#        # Customize the layout
+#        fig.update_xaxes(title='Recência Média')
+#        fig.update_yaxes(title='Classe')
+#        st.plotly_chart(fig)
 
 
 
