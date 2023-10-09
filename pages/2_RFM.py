@@ -35,7 +35,6 @@ def make_sidebar(df):
         'Escolha o Cluster',
         options=ordem_classes,
         index=0,
-        placeholder='Selecione'
     )
 
     return classes
@@ -138,9 +137,34 @@ def main():
         fig.update_xaxes(showgrid=True, zeroline=False)
         fig.update_yaxes(showgrid=False)
         st.plotly_chart(fig)
+    
+    with st.container():
+        st.write("---")
+        st.subheader('Ticket Médio por Cluster')
 
+        ordem_classes = [
+            'Campeão',
+            'Cliente leal',
+            'Lealdade potencial',
+            'Clientes Recentes',
+            'Promissores',
+            'Precisam de atenção',
+            'Prestes a hibernar',
+            'Clientes em risco',
+            'Não posso perdê-lo',
+            'Hibernando',
+            'Clientes Perdidos'
+            ]
+        
+        tm_cluster = (df.groupby('Classe')['ValorMonetário'].sum() / df.groupby('Classe')['Frequência'].sum()).reset_index()
+        tm_cluster = tm_cluster.rename(columns={0: 'Ticket Médio'})
+        tm_cluster['Classe'] = tm_cluster['Classe'].astype('category')
+        tm_cluster['Classe'].cat.set_categories(ordem_classes, inplace=True)
+        tm_cluster = tm_cluster.sort_values('Classe')
 
+        tm_cluster['Ticket Médio'] = 'R$' + tm_cluster['Ticket Médio'].round(2).astype(str)
 
+        st.write(tm_cluster.to_html(index=False, escape=False), unsafe_allow_html=True)
 
 #        valor_medio_por_classe = df.groupby('Classe')['ValorMonetário'].mean()
 #        valor_medio_por_classe = valor_medio_por_classe.loc[counts.index]  # Reordena de acordo com a contagem
