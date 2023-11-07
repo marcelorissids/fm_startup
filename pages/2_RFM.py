@@ -19,7 +19,7 @@ def make_sidebar(df):
 
     ordem_classes = [
     'Campeão',
-    'Cliente leal',
+    'Cliente leais',
     'Lealdade potencial',
     'Clientes Recentes',
     'Promissores',
@@ -91,7 +91,7 @@ def main():
 
         ordem_classes = [
             'Campeão',
-            'Cliente leal',
+            'Cliente leais',
             'Lealdade potencial',
             'Clientes Recentes',
             'Promissores',
@@ -144,7 +144,7 @@ def main():
 
         ordem_classes = [
             'Campeão',
-            'Cliente leal',
+            'Cliente leais',
             'Lealdade potencial',
             'Clientes Recentes',
             'Promissores',
